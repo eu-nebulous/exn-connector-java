@@ -1,0 +1,12 @@
+- project:
+    check:
+      jobs:
+        - nebulous-exn-connector-java-build-java-libraries
+        - nox-linters
+    gate:
+      jobs:
+        - nebulous-exn-connector-java-build-java-libraries
+        - nox-linters
+    promote:
+      jobs:
+        - nebulous-exn-connector-java-upload-java-libraries

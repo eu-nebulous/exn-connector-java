@@ -1,0 +1,20 @@
+- job:
+    name: nebulous-exn-connector-java-build-java-libraries
+    parent: nebulous-build-java-libraries
+    provides:
+      - nebulous-exn-connector-java-java-libraries
+    description: Build the java libraries.
+    files: &library_files
+      - ^exn-connector/
+    vars: &library_vars
+      java_libraries:
+        - context: exn-connector
+
+- job:
+    name: nebulous-exn-connector-java-upload-java-libraries
+    parent: nebulous-upload-java-libraries
+    provides:
+      - nebulous-exn-connector-java-java-libraries
+    description: Build and upload the java libraries.
+    files: *library_files
+    vars: *library_vars
