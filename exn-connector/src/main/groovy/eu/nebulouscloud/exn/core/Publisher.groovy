@@ -6,16 +6,23 @@ import org.apache.qpid.protonj2.client.Tracker
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
 class Publisher extends Link<Sender> {
     private static final Logger logger = LoggerFactory.getLogger(Publisher.class)
 
-    Publisher(String key, String address, boolean Topic, boolean FQDN) {
+    Publisher(String key, String address, boolean Topic, boolean FQDN=false) {
         super(key, address, Topic, FQDN)
     }
 
     public send(Map body) {
         logger.debug("{} Sending {}", this.address, body)
-        def msg = this.prepareMessage(body)
+        if(body == null){
+            body = [] as Map
+        }
+        def message = this.prepareMessage(body)
         Tracker tracker = this.link.send(message)
         tracker.awaitSettlement();
     }
@@ -29,6 +36,7 @@ class Publisher extends Link<Sender> {
         toSend.putAll(body)
         Message<Map<String, Object>> message = Message.create(toSend);
         message.contentType("application/json")
+        message.to(this.linkAddress)
         return message
 
     }

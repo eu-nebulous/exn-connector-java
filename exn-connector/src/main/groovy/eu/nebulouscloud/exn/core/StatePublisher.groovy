@@ -6,7 +6,7 @@ class StatePublisher extends Publisher{
     }
 
     private sendStateMessage(String state){
-        this.send(["state": message_type,"message": None])
+        this.send(["state": state, "message":""])
     }
 
     public starting(){

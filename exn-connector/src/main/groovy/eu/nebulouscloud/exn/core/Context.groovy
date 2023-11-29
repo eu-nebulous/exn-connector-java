@@ -26,11 +26,11 @@ class Context {
     }
 
     void registerPublisher(publisher) {
-        publishers[publisher.key] = publisher
+        publishers[publisher.key()] = publisher
     }
 
     void registerConsumers(consumer) {
-        consumers[consumer.key] = consumer
+        consumers[publisher.key()] = consumer
     }
 
     String buildAddressFromLink(Link link) {
