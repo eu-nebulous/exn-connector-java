@@ -1,5 +1,17 @@
 package eu.nebulouscloud.exn.core
 
+
+
+/**
+ * This is an extension of the {@link Publisher} class
+ * which abstracts the definition to send component states,
+ * which are required by the NebulOuScomponentns.
+ *
+ * An instance of this class is created during the boostrap
+ * process and available using the `state` key in the
+ * {@link Context}
+ *
+ */
 class StatePublisher extends Publisher{
     StatePublisher() {
         super("state", "state", true, false)

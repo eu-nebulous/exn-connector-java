@@ -5,12 +5,14 @@ import org.aeonbits.owner.Config.DefaultValue
 import org.aeonbits.owner.Config.Key
 import org.aeonbits.owner.Config.Sources
 
-@Sources([
-    "file:./exn.properties",
-    "classpath:exn.properties",
-    "system:properties",
-    "system:env"
-])
+/**
+ * This class extends {@link ExnConfig} and allows you
+ * to explicitly and statically define the configuration
+ * properties, in order to handle the  configuration
+ * of your component in the way you choose.
+ *
+ *
+ */
 public class StaticExnConfig implements ExnConfig {
 
     private final String baseName
@@ -26,7 +28,7 @@ public class StaticExnConfig implements ExnConfig {
         String username,
         String password,
         Integer healthTimeout=15,
-        String baseName='eu.nebulous'
+        String baseName='eu.nebulouscloud'
     ){
 
         this.url = url

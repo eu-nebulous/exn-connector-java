@@ -8,4 +8,3 @@
  */
 
 rootProject.name = 'eu.nebulouscloud.exn'
-include('examples')
