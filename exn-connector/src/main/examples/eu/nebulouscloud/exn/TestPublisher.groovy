@@ -4,6 +4,8 @@ import eu.nebulouscloud.exn.core.Context
 import eu.nebulouscloud.exn.core.Publisher
 import eu.nebulouscloud.exn.core.StatePublisher
 import eu.nebulouscloud.exn.handlers.ConnectorHandler
+import eu.nebulouscloud.exn.settings.ExnConfig
+import eu.nebulouscloud.exn.settings.StaticExnConfig
 import org.apache.qpid.protonj2.client.Message
 import org.apache.qpid.protonj2.client.exceptions.ClientException
 import org.slf4j.Logger
@@ -83,7 +85,9 @@ class MyConnectorHandler extends ConnectorHandler {
 public static void main(String[] args) {
     try {
 
+
         Connector c = new Connector(
+
                 "ui",
                 new MyConnectorHandler(),
                 [
@@ -92,7 +96,13 @@ public static void main(String[] args) {
                 ],
                 [],
                 true,
-                true
+                true,
+                new StaticExnConfig(
+                        'localhost',
+                        5672,
+                        "admin",
+                        "admin"
+                )
 
         )
 

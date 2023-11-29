@@ -3,6 +3,7 @@ import eu.nebulouscloud.exn.core.Consumer
 import eu.nebulouscloud.exn.core.Context
 import eu.nebulouscloud.exn.core.Handler
 import eu.nebulouscloud.exn.handlers.ConnectorHandler
+import eu.nebulouscloud.exn.settings.StaticExnConfig
 import org.apache.qpid.protonj2.client.Message
 import org.apache.qpid.protonj2.client.exceptions.ClientException
 import org.slf4j.Logger
@@ -43,7 +44,13 @@ public static void main(String[] args) {
                                 }
                             }
                         },true,true),
-                ]
+                ],
+                new StaticExnConfig(
+                        'localhosts',
+                        5672,
+                        "admin",
+                        "admin"
+                )
         )
         c.start()
     } catch (ClientException e) {

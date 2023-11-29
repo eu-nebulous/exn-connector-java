@@ -34,7 +34,8 @@ public class Connector {
             List<Publisher> publishers,
             List<Consumer> consumers,
             boolean enableState = true,
-            boolean enableHealth = true
+            boolean enableHealth = true,
+            ExnConfig configuration
     ) {
 
         assert component
@@ -43,11 +44,16 @@ public class Connector {
         this.running = new AtomicBoolean(true);
         this.handler = new AtomicReference<>(handler)
         this.config = ConfigFactory.create(ExnConfig.class)
-        ExnConfig config = ConfigFactory.create(ExnConfig.class)
+
+        if (configuration == null ){
+            configuration = ConfigFactory.create(ExnConfig.class)
+        }
+
+        this.config = configuration
         this.context = new AtomicReference<>(
                 new Context(
-                        "${config.url()}:${config.port()}",
-                        "${config.baseName()}.${this.component}"
+                        "${configuration .url()}:${configuration .port()}",
+                        "${configuration .baseName()}.${this.component}"
                 )
         )
 
