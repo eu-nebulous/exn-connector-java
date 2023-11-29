@@ -69,7 +69,6 @@ public class Connector {
         }
         this.config = configuration
         this.context = new Context(
-                        "${configuration.url()}:${configuration.port()}",
                         "${configuration.baseName()}.${this.component}",
                         handler
                 )

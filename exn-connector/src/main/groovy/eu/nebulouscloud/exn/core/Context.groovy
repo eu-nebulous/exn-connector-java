@@ -24,7 +24,6 @@ class Context {
 
     Logger logger = LoggerFactory.getLogger(Context.class)
 
-    private final String uri
     private final String base
     private final Map<String,Publisher> publishers = [:]
     private final Map<String,Consumer> consumers = [:]
@@ -32,8 +31,7 @@ class Context {
 
     private Manager manager
 
-    public Context(String uri, String base, ConnectorHandler handler){
-        this.uri = uri
+    public Context(String base, ConnectorHandler handler){
         this.base = base
         this.handler = handler
     }
@@ -98,6 +96,11 @@ class Context {
     }
 
     void registerPublisher(Publisher publisher) {
+        if(publishers.containsKey(publisher.key)){
+            logger.warn("Trying to register a publisher that is already registered {}=>{} ",publisher.key(), publisher.address())
+            return
+        }
+
         publishers[publisher.key()] = publisher
         if(this.manager !=null && this.manager.getRunning()){
             final Publisher p =publisher
@@ -106,6 +109,10 @@ class Context {
     }
 
     void registerConsumer(Consumer consumer) {
+        if(consumers.containsKey(consumer.key)){
+            logger.warn("Trying to register a consumer that is already registered {}=>{} ",consumer.key(),consumer.address())
+            return
+        }
         logger.debug("Registering consumer {}=>{}",consumer.key(),consumer.address())
         consumers[consumer.key()] = consumer
         if(this.manager !=null && this.manager.getRunning()){

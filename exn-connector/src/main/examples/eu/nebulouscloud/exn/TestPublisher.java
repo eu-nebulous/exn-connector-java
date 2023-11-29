@@ -39,9 +39,9 @@ class MyPublisherTestConnectorHandler extends ConnectorHandler {
             developer, a check never did any harm.
 
             The state publisher is a core publisher with the required
-            methods to pubilsh component state.
+            methods to publish component state.
 
-            Calling these methods and bootstraing them into the application
+            Calling these methods and bootstrapping them into the application
             logic falls on the developer.
 
          */
@@ -70,7 +70,7 @@ class MyPublisherTestConnectorHandler extends ConnectorHandler {
                     "one"
             );
             (context.getPublisher("config")).send(
-                    Map.of("hello","world"),
+                    Map.of("good","bye"),
                     "two"
             );
 
@@ -105,7 +105,8 @@ class TestPublisher{
                             "localhost",
                             5672,
                             "admin",
-                            "admin"
+                            "admin",
+                            5
                     )
 
             );

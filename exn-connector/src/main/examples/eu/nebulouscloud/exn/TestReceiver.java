@@ -81,7 +81,6 @@ class TestReceiver{
                             new Consumer("config_two","config", new Handler(){
                                 @Override
                                 public void onMessage(String key, String address, Map body, Message rawMessage, Context context) {
-
                                     System.out.println("These are my TWO config => "+ String.valueOf(body));
                                 }
                             },"two", true)
