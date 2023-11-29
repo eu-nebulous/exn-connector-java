@@ -17,7 +17,7 @@ abstract class ConnectorHandler {
     }
 
 
-    public onReady(AtomicReference<Context> context){
+    public void onReady(AtomicReference<Context> context){
 
     }
 

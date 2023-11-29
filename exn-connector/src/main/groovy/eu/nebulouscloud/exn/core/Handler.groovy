@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference
 abstract class Handler {
     private static final Logger logger = LoggerFactory.getLogger(Consumer.class)
 
-    public onMessage(String key, String address, Map body, Message message, AtomicReference<Context> context){
+    public void onMessage(String key, String address, Map body, Message message, AtomicReference<Context> context){
         logger.debug("Default on message for delivery for {} => {} ({}) = {}",
                 key,
                 address,

@@ -33,7 +33,7 @@ class MyConnectorHandler extends ConnectorHandler {
 
 
     @Override
-    def onReady(AtomicReference<Context> context) {
+    def void onReady(AtomicReference<Context> context) {
         println ("Ready")
 
 

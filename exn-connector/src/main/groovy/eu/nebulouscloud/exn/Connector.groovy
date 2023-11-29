@@ -57,15 +57,15 @@ public class Connector {
                 )
         )
 
-
+        List<Publisher> compiledPublishers = new ArrayList<>()
         if (enableState) {
-            publishers.add(
+            compiledPublishers.add(
                     new StatePublisher()
             )
         }
 
         if (enableHealth) {
-            publishers.add(
+            compiledPublishers.add(
                     new SchedulePublisher(
                             this.config.healthTimeout(),
                             'health',
@@ -75,7 +75,8 @@ public class Connector {
                     )
             )
         }
-        this.publishers = publishers
+        compiledPublishers.addAll(publishers)
+        this.publishers = compiledPublishers
         this.executorService = Executors.newCachedThreadPool();
 
     }
@@ -130,12 +131,15 @@ public class Connector {
             connectionOpts.reconnectEnabled(true);
             this.connection = client.connect(config.url(), config.port(), connectionOpts)
             for (Publisher p : publishers) {
+
                 String address = this.context.get().buildAddressFromLink(p)
                 p.setLink(address,connection.openSender(address))
                 logger.debug("Registering publisher {}", p)
                 this.context.get().registerPublisher(p)
 
                 if (p instanceof SchedulePublisher){
+                    logger.debug("Adding scheduled publisher as scheduled publisher {}", p)
+                    final Publisher threadPublisher = p;
                     this.executorService.submit(
                         new Runnable() {
                             @Override
@@ -143,12 +147,12 @@ public class Connector {
                                 boolean healthy = true
                                 while(healthy && running.get()){
                                     try{
-                                        logger.debug("Processing scheduled executor [{}] {}  ",p.key, address)
-                                        p.send()
-                                        logger.debug("\t waiting for  {} = {}  ",address,p.delay)
-                                        Thread.sleep(p.delay*1000)
+                                        logger.debug("Processing scheduled executor [{}] {}  ", threadPublisher.key, address)
+                                        threadPublisher.send()
+                                        logger.debug("\t waiting for  {} = {}  ",address, threadPublisher.delay)
+                                        Thread.sleep(threadPublisher.delay*1000)
                                     }catch (Exception e){
-                                        logger.error("Error processing scheduled executor [{}] - disabling", p.key,e)
+                                        logger.error("Error processing scheduled executor [{}] - disabling", threadPublisher.key,e)
                                         healthy=false
                                     }
                                 }

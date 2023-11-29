@@ -30,7 +30,7 @@ class Context {
     }
 
     void registerConsumers(consumer) {
-        consumers[publisher.key()] = consumer
+        consumers[consumer.key()] = consumer
     }
 
     String buildAddressFromLink(Link link) {
