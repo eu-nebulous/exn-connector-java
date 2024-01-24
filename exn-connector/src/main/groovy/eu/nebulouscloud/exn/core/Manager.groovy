@@ -3,8 +3,13 @@ package eu.nebulouscloud.exn.core
 import org.apache.qpid.protonj2.client.Connection
 import org.apache.qpid.protonj2.client.Delivery
 import org.apache.qpid.protonj2.client.Receiver
+import org.apache.qpid.protonj2.client.ReceiverOptions
 import org.apache.qpid.protonj2.client.Session
+import org.apache.qpid.protonj2.client.SourceOptions
 import org.apache.qpid.protonj2.client.exceptions.ClientException
+import org.apache.qpid.protonj2.types.Symbol
+import org.apache.qpid.protonj2.types.messaging.AmqpValue
+import org.apache.qpid.protonj2.types.messaging.Source
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -112,7 +117,21 @@ class Manager {
                 try {
                     Session session = connection.openSession().openFuture().get();
 
-                    Receiver receiver = session.openReceiver(address).openFuture().get();
+                    Source source = new Source();
+                    source.setAddress(consumer.address());
+
+                    ReceiverOptions receiverOptions = new ReceiverOptions();
+
+                    if(consumer.hasApplication()){
+                        String filterExpression = "application = '"+consumer.aplication+"'";
+                        receiverOptions.sourceOptions().filters(
+                            Collections.singletonMap(
+                                    "apache.org:selector-filter:string",
+                                    new AmqpValue(filterExpression))
+                        );
+                    }
+
+                    Receiver receiver = session.openReceiver(address,receiverOptions).openFuture().get();
 
                     logger.info("Linking consumer {}", address)
                     if (consumer.hasApplication()){
