@@ -67,7 +67,7 @@ class SyncedPublisher extends Publisher{
 
         Future<Map> res= executor.submit {
             while (replied.get() == null) {
-                Thread.sleep(500)
+                Thread.sleep(50)
             }
         }
         correlationIds.put(correlationId, res)

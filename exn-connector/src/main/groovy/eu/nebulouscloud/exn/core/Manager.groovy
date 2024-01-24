@@ -75,8 +75,8 @@ class Manager {
      * @param consumers
      */
     protected void startPublisher(Context context, Publisher publisher) {
-        logger.debug("Registering publisher {}", publisher)
         String address = context.buildAddressFromLink(publisher)
+        logger.debug("Registering publisher {} {} ", publisher,address)
         publisher.setLink(address,this.connection.openSender(address))
 
         if (publisher instanceof SchedulePublisher){

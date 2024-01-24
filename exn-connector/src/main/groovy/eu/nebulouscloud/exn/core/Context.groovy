@@ -139,17 +139,16 @@ class Context {
 
     void stop(){
 
-        publishers.each {p -> {
-            p.setActive(false)
-            p.link.close()
-        }}
-
-        consumers.each {p -> {
-            p.setActive(false)
-            p.link.close()
-        }}
-
         manager.stop()
+
+        publishers.each {p -> {
+            p.link.close()
+            p.setActive(false)
+        }}
+        consumers.each {p -> {
+            p.link.close()
+            p.setActive(false)
+        }}
 
     }
 

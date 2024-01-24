@@ -58,6 +58,8 @@ class Publisher extends Link<Sender> {
      * This method send the body without filtering
      * on a specific application.
      *
+     * This method should be overriden
+     *
      * @param body
      * @return
      */
@@ -98,7 +100,7 @@ class Publisher extends Link<Sender> {
      */
     public void send(Map body, String application, Map<String,String> properties, boolean raw) {
 
-        logger.debug("{} Sending {}-> {} ", this.address, body,properties)
+        logger.debug("{} Sending {}-> {} ", this.linkAddress, body,properties)
         if(body == null){
             body = [:] as Map
         }
@@ -106,6 +108,7 @@ class Publisher extends Link<Sender> {
         def message = this.prepareMessage(body, properties, raw)
         if(application != null && application != ''){
             message.subject(application)
+            message.property('application',application)
         }
         Tracker tracker = this.link.send(message)
         tracker.awaitSettlement();

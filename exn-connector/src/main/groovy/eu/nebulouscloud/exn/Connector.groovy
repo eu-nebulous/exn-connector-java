@@ -112,7 +112,6 @@ public class Connector {
     public void stop() {
         this.context.stop()
 
-
         def executor = Executors.newSingleThreadScheduledExecutor()
         executor
             .schedule(new Runnable() {

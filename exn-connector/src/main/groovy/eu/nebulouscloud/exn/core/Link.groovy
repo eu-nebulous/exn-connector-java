@@ -46,8 +46,6 @@ abstract class Link<T extends org.apache.qpid.protonj2.client.Link<T>>{
         this.linkAddress =address
     }
 
-
-
     boolean getActive() {
         return active
     }
