@@ -13,8 +13,10 @@ import org.apache.qpid.protonj2.types.messaging.Source
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 
@@ -49,6 +51,7 @@ class Manager {
         this.running.set(false)
         executorService.shutdown()
     }
+
 
     public start(){
         this.running.set(true)
@@ -108,8 +111,10 @@ class Manager {
      * @param context
      * @param consumers
      */
-    protected void startConsumer(Context context, Consumer consumer) {
+    protected startConsumer(Context context, Consumer consumer) {
         logger.debug("Starting consumer {} => {}", consumer.key(),consumer.address())
+
+        CountDownLatch ready = new CountDownLatch(1)
         executorService.submit(new Runnable() {
             @Override
             void run() {
@@ -138,6 +143,7 @@ class Manager {
                         logger.info("\t for application {}", consumer.getAplication())
                     }
                     consumer.setLink(address,receiver)
+                    ready.countDown()
                     while (running && consumer.getActive()) {
                         Delivery delivery = receiver.receive();
                         logger.debug("received delivery {}", address)
@@ -162,6 +168,9 @@ class Manager {
                 }
             }
         });
+
+
+        ready.await(5000, TimeUnit.SECONDS)
 
     }
 

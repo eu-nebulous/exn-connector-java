@@ -5,6 +5,7 @@ import groovy.util.logging.Log
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -28,6 +29,7 @@ class Context {
     private final Map<String,Publisher> publishers = [:]
     private final Map<String,Consumer> consumers = [:]
     private final ConnectorHandler handler
+    private CountDownLatch registrations
 
     private Manager manager
 
@@ -51,12 +53,10 @@ class Context {
 
         this.manager = manager
 
-
         logger.info("Registering {} consumers", this.consumers.size())
         this.manager.start()
         this.consumers.each({
             k,v -> {
-
                 final Consumer c =v
                 this.manager.startConsumer(this, c)
 

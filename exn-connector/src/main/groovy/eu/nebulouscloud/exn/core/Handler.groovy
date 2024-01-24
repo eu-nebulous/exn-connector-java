@@ -32,4 +32,15 @@ abstract class Handler {
 
     }
 
+    public boolean matchCorrelationId(Message message, String id){
+
+        boolean ret = false
+        try{
+            ret =  message.correlationId() == id
+        }catch (Exception e){}
+
+        return ret
+
+    }
+
 }

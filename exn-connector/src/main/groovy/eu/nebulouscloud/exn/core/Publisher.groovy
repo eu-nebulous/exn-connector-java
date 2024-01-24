@@ -6,6 +6,7 @@ import org.apache.qpid.protonj2.client.Tracker
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.swing.MenuSelectionManager
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -22,6 +23,8 @@ import java.time.format.DateTimeFormatter
  * content-type, message payload, and serialization
  *
  */
+
+
 
 class Publisher extends Link<Sender> {
     private static final Logger logger = LoggerFactory.getLogger(Publisher.class)
@@ -50,8 +53,6 @@ class Publisher extends Link<Sender> {
      * This method send the body without filtering
      * on a specific application.
      *
-     * This method should be overriden
-     *
      * @param body
      * @return
      */
@@ -64,9 +65,16 @@ class Publisher extends Link<Sender> {
     }
 
     public void send(Map body, String application) {
-        send(body,application,false)
+        send(body,application, false)
     }
 
+    public void send(Map body, String application, Map<String,String> properties) {
+        send(body, application, properties, false)
+    }
+
+    public void send(Map body, String application, boolean raw) {
+        send(body, application, null,  raw)
+    }
 
     /**
      * Use this method to send a message using this
@@ -74,17 +82,23 @@ class Publisher extends Link<Sender> {
      *
      * @param body This is the payload of the message
      * @param application This is the application for which to send the message to
+     * @param properties This is a map of AMQP properties which can be parsed in the message generation
+     *                   supported properties are
+     *
+     *                   - reply-to
+     *                   - correlation-id
+     *
      * @param raw Do not append default message keys
      * @return
      */
-    public void send(Map body, String application, boolean raw) {
+    public void send(Map body, String application, Map<String,String> properties, boolean raw) {
 
-        logger.debug("{} Sending {}", this.address, body)
+        logger.debug("{} Sending {}-> {} ", this.address, body,properties)
         if(body == null){
             body = [:] as Map
         }
 
-        def message = this.prepareMessage(body,raw)
+        def message = this.prepareMessage(body, properties, raw)
         if(application != null && application != ''){
             message.subject(application)
         }
@@ -93,7 +107,7 @@ class Publisher extends Link<Sender> {
     }
 
 
-    private Message<Map<String, Object>> prepareMessage(Map body, boolean raw){
+    protected Message<Map<String, Object>> prepareMessage(Map body, Map<String,String> properties, boolean raw){
 
         def Map<String,Object> toSend=[:]
 
@@ -103,9 +117,29 @@ class Publisher extends Link<Sender> {
 
         toSend.putAll(body)
         Message<Map<String, Object>> message = Message.create(toSend);
+        message.messageId(UUID.randomUUID().toString().replace("-", ""))
+
+        if(properties !=null){
+
+            if(properties.containsKey('reply-to')){
+                message.replyTo(properties.get('reply-to'))
+            }
+
+            if(properties.containsKey('correlation-id')){
+                message.correlationId(properties.get('correlation-id'))
+            }
+
+        }
+
+
         message.contentType("application/json")
+        message.correlationId()
+
+
         message.to(this.linkAddress)
         return message
 
     }
+
+
 }
