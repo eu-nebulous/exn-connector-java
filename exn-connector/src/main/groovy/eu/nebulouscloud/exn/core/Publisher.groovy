@@ -50,16 +50,23 @@ class Publisher extends Link<Sender> {
      * This method send the body without filtering
      * on a specific application.
      *
+     * This method should be overriden
+     *
      * @param body
      * @return
      */
     public void send() {
-        send([:] as Map,'')
+        send(null,'',false)
     }
 
-    public send(Map body) {
-        send(body,'')
+    public void send(Map body) {
+        send(body,'',false)
     }
+
+    public void send(Map body, String application) {
+        send(body,application,false)
+    }
+
 
     /**
      * Use this method to send a message using this
@@ -67,15 +74,17 @@ class Publisher extends Link<Sender> {
      *
      * @param body This is the payload of the message
      * @param application This is the application for which to send the message to
+     * @param raw Do not append default message keys
      * @return
      */
+    public void send(Map body, String application, boolean raw) {
 
-    public send(Map body, String application) {
         logger.debug("{} Sending {}", this.address, body)
         if(body == null){
-            body = [] as Map
+            body = [:] as Map
         }
-        def message = this.prepareMessage(body)
+
+        def message = this.prepareMessage(body,raw)
         if(application != null && application != ''){
             message.subject(application)
         }
@@ -84,15 +93,16 @@ class Publisher extends Link<Sender> {
     }
 
 
-    private Message<Map<String, Object>> prepareMessage(Map body){
+    private Message<Map<String, Object>> prepareMessage(Map body, boolean raw){
 
-        def toSend=[
-                "when": ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
-        ]
+        def Map<String,Object> toSend=[:]
+
+        if(!raw){
+            toSend["when"] = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+        }
 
         toSend.putAll(body)
         Message<Map<String, Object>> message = Message.create(toSend);
-
         message.contentType("application/json")
         message.to(this.linkAddress)
         return message
