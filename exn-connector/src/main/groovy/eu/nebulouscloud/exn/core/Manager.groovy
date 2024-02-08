@@ -2,6 +2,7 @@ package eu.nebulouscloud.exn.core
 
 import org.apache.qpid.protonj2.client.Connection
 import org.apache.qpid.protonj2.client.Delivery
+import org.apache.qpid.protonj2.client.Message
 import org.apache.qpid.protonj2.client.Receiver
 import org.apache.qpid.protonj2.client.ReceiverOptions
 import org.apache.qpid.protonj2.client.Session
@@ -100,6 +101,23 @@ class Manager {
                     }
 
             )
+        }
+        if(publisher instanceof SyncedPublisher){
+            final p = publisher
+            startConsumer(context, new Consumer(
+                    publisher.key+"-reply",
+                    publisher.replyAddress,
+                    new Handler() {
+                        @Override
+                        void onMessage(String key, String onAddress, Map body, Message message, Context onAcontext) {
+                            if(p.hasCorrelationId(message.correlationId())){
+                                p.replied.set(body)
+                            }
+                        }
+                    },
+                    publisher.replyTopic,
+                    publisher.replyFQDN
+            ))
         }
     }
 
