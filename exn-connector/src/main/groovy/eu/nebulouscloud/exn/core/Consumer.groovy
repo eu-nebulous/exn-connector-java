@@ -74,14 +74,22 @@ class Consumer extends Link<Receiver>{
         Message message = delivery.message();
 
         Map body = this.processMessage(message, context)
-        this.handler.onMessage(
-                this.key,
-                this.address,
-                body,
-                message,
-                context
-        )
-        delivery.accept()
+        try {
+            this.handler.onMessage(
+                    this.key,
+                    this.address,
+                    body,
+                    message,
+                    context
+            )
+            delivery.accept()
+        }catch (Exception e){
+            if(!delivery.state().isAccepted()){
+                delivery.reject('Generic onMessage error',e.message)
+            }
+            logger.error('Generic onMessage error',e)
+        }
+
     }
 
 }
