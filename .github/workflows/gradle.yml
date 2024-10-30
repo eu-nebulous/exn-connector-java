@@ -1,9 +1,10 @@
-name: Build and Deploy Maven Package
+name: Build and Deploy Gradle Package
 
 on:
   push:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,6 +22,7 @@ jobs:
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        working-directory: nebulous-requirements-extractor
+        working-directory: exn-connector
         run: |
-          mvn --no-transfer-progress clean deploy
+          ./gradlew build
+          ./gradlew publish
