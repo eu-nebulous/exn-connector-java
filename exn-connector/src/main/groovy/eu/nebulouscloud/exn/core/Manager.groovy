@@ -6,9 +6,8 @@ import org.apache.qpid.protonj2.client.Message
 import org.apache.qpid.protonj2.client.Receiver
 import org.apache.qpid.protonj2.client.ReceiverOptions
 import org.apache.qpid.protonj2.client.Session
-import org.apache.qpid.protonj2.client.SourceOptions
 import org.apache.qpid.protonj2.client.exceptions.ClientException
-import org.apache.qpid.protonj2.types.Symbol
+import org.apache.qpid.protonj2.client.exceptions.ClientIllegalStateException
 import org.apache.qpid.protonj2.types.messaging.AmqpValue
 import org.apache.qpid.protonj2.types.messaging.Source
 import org.slf4j.Logger
@@ -104,13 +103,18 @@ class Manager {
         }
         if(publisher instanceof SyncedPublisher){
             final p = publisher
-            startConsumer(context, new Consumer(
+            context.registerConsumer(new Consumer(
                     publisher.key+"-reply",
                     publisher.replyAddress,
                     new Handler() {
                         @Override
                         void onMessage(String key, String onAddress, Map body, Message message, Context onAcontext) {
-                            if(p.hasCorrelationId(message.correlationId())){
+
+                            if(message.correlationId() == null){
+                                logger.error("Received reply without correlation id for SyncedPublisher[{}] listener",publisher.replyAddress)
+                            }
+
+                            if(message.correlationId() !=null && p.hasCorrelationId(message.correlationId())){
                                 p.replied.set(body)
                             }
                         }
@@ -163,26 +167,31 @@ class Manager {
                     consumer.setLink(address,receiver)
                     ready.countDown()
                     while (running && consumer.getActive()) {
-                        Delivery delivery = receiver.receive();
-                        logger.debug("received delivery {}", address)
-                        if (delivery != null) {
-                            if(consumer.hasApplication()){
-                                if(consumer.getAplication() == delivery.message().subject()){
-                                    consumer.onDelivery(delivery, context)
-                                }
-                            }else{
-                                consumer.onDelivery(delivery, context)
+                        try{
 
+                            Delivery delivery = receiver.receive();
+                            logger.debug("received delivery {}", address)
+                            if (delivery != null) {
+                                if(consumer.hasApplication()){
+                                    if(consumer.getAplication() == delivery.message().subject()){
+                                        consumer.onDelivery(delivery, context)
+                                    }
+                                }else{
+                                    consumer.onDelivery(delivery, context)
+
+                                }
                             }
+                        }catch (ClientIllegalStateException ignored){
+                            logger.warn("Seems the consumer has been stopped")
                         }
                     }
                     logger.info("Stopping consumer {}", address)
                     receiver.close();
                     session.close();
-                } catch (ClientException e) {
-                    logger.error("Client exception for {} ",address,e)
-                } catch (Exception e){
-                    logger.error("General exception for {} ",address,e)
+                } catch (ClientException ignored) {
+                    logger.error("Client exception for {} ",address)
+                } catch (Exception ignored){
+                    logger.error("General exception for {} ",address)
                 }
             }
         });

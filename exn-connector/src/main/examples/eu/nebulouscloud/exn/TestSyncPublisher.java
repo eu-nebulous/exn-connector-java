@@ -13,23 +13,29 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class MySyncedHandler extends ConnectorHandler {
 
     Logger logger = LoggerFactory.getLogger(MySyncedHandler.class);
+    AtomicBoolean run = new AtomicBoolean(false);
+
 
     @Override
     public void onReady(Context context) {
 
+        while(run.get()) {
+            if (context.hasPublisher("synced")) {
 
-        if (context.hasPublisher("synced")) {
+                logger.debug("Sending synced");
+                Map ret = ((SyncedPublisher) context.getPublisher("synced")).sendSync(
+                        Map.of("message", "hello world"),
+                        null, null, false
+                );
+                logger.debug("Received synced " + ret);
 
-            logger.debug("Sending synced");
-            Map ret = ((SyncedPublisher) context.getPublisher("synced")).sendSync(
-                    Map.of("message", "hello world"),
-                    null, null, false
-            );
-            logger.debug("Received synced " + ret);
+            }
+
 
         }
     }
@@ -39,12 +45,13 @@ class MySyncedHandler extends ConnectorHandler {
 class TestSyncedPublisher {
 
     static Logger logger = LoggerFactory.getLogger(TestSyncedPublisher.class);
+    static MySyncedHandler handler = new MySyncedHandler();
 
     public static void main(String[] args) {
         try {
             Connector c = new Connector(
                     "ui",
-                    new MySyncedHandler(),
+                    handler,
                     List.of(
                             new SyncedPublisher("synced", "synced", true),
                             new Publisher("synced_reply", "synced.reply", true)
@@ -88,9 +95,11 @@ class TestSyncedPublisher {
                             "admin"
                     )
             );
+            handler.run.set(true);
             c.start();
 
         } catch (Exception e) {
+            handler.run.set(false);
             e.printStackTrace();
         }
     }
