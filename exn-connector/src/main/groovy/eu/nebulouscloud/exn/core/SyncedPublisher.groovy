@@ -35,13 +35,15 @@ class SyncedPublisher extends Publisher{
     protected AtomicReference<Map> replied
     private ConcurrentHashMap<String,Future<Map>> correlationIds
     private ExecutorService executor
+    private int timeout
 
     SyncedPublisher(String key, String address, boolean Topic, boolean FQDN=false,
-                    String replyAddress="reply") {
+                    int timeout=5000, String replyAddress="reply") {
         super(key, address, Topic, FQDN)
         this.replyAddress = this.address+"."+replyAddress
         this.replyTopic = Topic
         this.replyFQDN = FQDN
+        this.timeout = timeout ? timeout : 5000
         this.replied = new AtomicReference<>()
         this.correlationIds = new ConcurrentHashMap<>()
         this.executor= Executors.newSingleThreadExecutor()
@@ -49,6 +51,8 @@ class SyncedPublisher extends Publisher{
 
 
     public Map sendSync(Map body, String application, Map<String,String> properties, boolean raw) {
+
+
         String correlationId = UUID.randomUUID().toString().replace("-", "")
 
         Map<String,String> sendPropeties = new HashMap<>()
@@ -66,13 +70,12 @@ class SyncedPublisher extends Publisher{
         this.replied.set(null)
 
         Future<Map> res= executor.submit {
-            while (replied.get() == null) {
+            while (replied.get() == null && timeout > 0) {
                 Thread.sleep(50)
+                this.timeout = this.timeout - 50
             }
         }
         correlationIds.put(correlationId, res)
-
-
         send(body,application,sendPropeties,raw)
         res.get()
         Map ret = this.replied.get()

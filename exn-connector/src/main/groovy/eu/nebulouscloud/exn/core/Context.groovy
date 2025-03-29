@@ -132,7 +132,19 @@ class Context {
 
     void unregisterPublisher(String key){
         if(publishers.containsKey(key)){
+            Publisher p = publishers.get(key)
+            p.setActive(false)
+            p.link.close()
             publishers.remove(key)
+
+            if (p instanceof SyncedPublisher){
+
+                logger.debug("Deregistering consumer for SyncedPublisher {}-reply", key)
+                Consumer c= consumers.get(key+"-reply")
+                c.setActive(false)
+                c.link.session().close()
+                consumers.remove(key+"-reply")
+            }
         }
     }
 
@@ -141,13 +153,13 @@ class Context {
 
         manager.stop()
 
-        publishers.each {p -> {
-            p.link.close()
-            p.setActive(false)
+        publishers.each {key,publisher -> {
+            publisher.setActive(false)
+            publisher.link.session().close()
         }}
-        consumers.each {p -> {
-            p.link.close()
-            p.setActive(false)
+        consumers.each {key,consumer -> {
+            consumer.setActive(false)
+            consumer.link.session().close()
         }}
 
     }

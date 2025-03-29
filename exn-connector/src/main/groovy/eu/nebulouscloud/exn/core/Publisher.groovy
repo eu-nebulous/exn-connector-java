@@ -141,9 +141,6 @@ class Publisher extends Link<Sender> {
 
 
         message.contentType("application/json")
-        message.correlationId()
-
-
         message.to(this.linkAddress)
         return message
 
