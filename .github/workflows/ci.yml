@@ -1,0 +1,36 @@
+name: CI
+on:
+  push:
+    branches:
+      - dev
+      - main
+      - r[1-9]
+  pull_request:
+    branches:
+      - dev
+      - main
+      - r[1-9]
+jobs:
+  publish-exn-connector-to-maven-central-portal-snapshot:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          server-id: central-portal-snapshots
+          server-username: MAVEN_CENTRAL_PORTAL_USERNAME
+          server-password: MAVEN_CENTRAL_PORTAL_PASSWORD
+
+      - name: Run mvn verify
+        working-directory: exn-connector
+        run: mvn verify
+
+      - name: Run mvn deploy
+        working-directory: exn-connector
+        if: github.event_name != 'pull_request'
+        run: mvn deploy

@@ -1,21 +1,21 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>eu.nebulouscloud</groupId>
+    <groupId>io.github.eu-nebulous</groupId>
     <artifactId>exn-connector-java</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Nebulous Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/eu-nebulous/exn-connector-java</url>
-        </repository>
+        <snapshotRepository>
+            <id>central-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
-	
+
     <properties>
         <maven.compiler.release>11</maven.compiler.release>
         <groovy.version>3.0.10</groovy.version>
@@ -29,8 +29,8 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-	    <version>${groovy.version}</version>
-	    <type>pom</type>
+            <version>${groovy.version}</version>
+            <type>pom</type>
         </dependency>
 
         <!-- Guava -->
@@ -126,4 +126,3 @@
         </plugins>
     </build>
 </project>
-
