@@ -10,6 +10,9 @@ on:
       - dev
       - main
       - r[1-9]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday at midnight
+  workflow_dispatch:
 jobs:
   publish-exn-connector-to-maven-central-portal-snapshot:
     name: Publish exn-connector snapshot
