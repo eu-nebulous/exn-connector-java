@@ -71,10 +71,9 @@ class Consumer extends Link<Receiver>{
 
     protected void onDelivery(Delivery delivery, Context context){
         logger.debug("Default on delivery for delivery for {}",this.linkAddress)
-        Message message = delivery.message();
-
-        Map body = this.processMessage(message, context)
         try {
+            Message message = delivery.message();
+            Map body = this.processMessage(message, context)
             this.handler.onMessage(
                     this.key,
                     this.address,
