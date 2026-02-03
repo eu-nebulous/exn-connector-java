@@ -15,8 +15,8 @@ dependencies {
     // Use the latest Groovy version for building this library
     implementation 'org.codehaus.groovy:groovy-all:3.0.10'
 
-    api group: 'org.apache.qpid', name: 'protonj2-client', version: '1.0.0-M16'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.12'
+    api group: 'org.apache.qpid', name: 'protonj2-client', version: '1.1.0'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.9'
     implementation group: 'org.aeonbits.owner', name: 'owner', version: '1.0.12'
 
     // Use the awesome Spock testing and specification framework even with Java
