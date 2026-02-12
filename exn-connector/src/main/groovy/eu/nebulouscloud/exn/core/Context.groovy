@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference
  * This class maintains the application states and is provided
  * inside the event loop.
  *
+ *
  * It includes a set of utilities which are helpful during
  * setup of your asynchronous application and after its
  * initialization.
